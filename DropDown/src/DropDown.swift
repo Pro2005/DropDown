@@ -77,7 +77,11 @@ public final class DropDown: UIView {
 
 	/// The current visible drop down. There can be only one visible drop down at a time.
 	public static weak var VisibleDropDown: DropDown?
-
+    public var maxVisibleItem: Int = 5 {
+        didSet {
+            setNeedsUpdateConstraints()
+        }
+    }
 	//MARK: UI
 	fileprivate let dismissableView = UIView()
 	fileprivate let tableViewContainer = UIView()
@@ -568,8 +572,11 @@ extension DropDown {
 		yConstraint.constant = layout.y
 		widthConstraint.constant = layout.width
 		heightConstraint.constant = layout.visibleHeight
-
-		tableView.isScrollEnabled = layout.offscreenHeight > 0
+        if maxVisibleItem != 0 {
+            tableView.isScrollEnabled = dataSource.count > maxVisibleItem
+        } else {
+            tableView.isScrollEnabled = layout.offscreenHeight > 0
+        }
 
 		DispatchQueue.main.async { [weak self] in
 			self?.tableView.flashScrollIndicators()
@@ -1019,7 +1026,16 @@ extension DropDown {
 
 	/// Returns the height needed to display all cells.
 	fileprivate var tableHeight: CGFloat {
-		return tableView.rowHeight * CGFloat(dataSource.count)
+        let height = tableView.rowHeight * CGFloat(dataSource.count)
+        if maxVisibleItem != 0 {
+            let maxHeight = tableView.rowHeight * CGFloat(maxVisibleItem)
+            if height <= maxHeight {
+                return height
+            } else {
+                return maxHeight
+            }
+        }
+		return height
 	}
 
     //MARK: Objective-C methods for converting the Swift type Index
