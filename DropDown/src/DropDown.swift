@@ -582,10 +582,11 @@ extension DropDown {
         } else {
             tableView.isScrollEnabled = layout.offscreenHeight > 0
         }
-
-		DispatchQueue.main.async { [weak self] in
-			self?.tableView.flashScrollIndicators()
-		}
+        if dataSource.count > maxVisibleItem {
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.flashScrollIndicators()
+            }
+        }
 
 		super.updateConstraints()
 	}
