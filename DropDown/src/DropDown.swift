@@ -138,6 +138,8 @@ public final class DropDown: UIView {
 	public var bottomOffset: CGPoint = .zero {
 		didSet { setNeedsUpdateConstraints() }
 	}
+    
+    public var bottomExtraHeightIfMaxVisibleItemsReach: CGFloat? = 0
 
     /**
     The offset from the bottom of the window when the drop down is shown below the anchor view.
@@ -574,6 +576,9 @@ extension DropDown {
 		heightConstraint.constant = layout.visibleHeight
         if maxVisibleItem != 0 {
             tableView.isScrollEnabled = dataSource.count > maxVisibleItem
+            if dataSource.count > maxVisibleItem, let extraHeight = bottomExtraHeightIfMaxVisibleItemsReach {
+                heightConstraint.constant += extraHeight
+            }
         } else {
             tableView.isScrollEnabled = layout.offscreenHeight > 0
         }
